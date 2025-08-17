@@ -1,4 +1,4 @@
-import { useState, type Key } from "react";
+import { useMemo, useState } from "react";
 import "./Home.css";
 import { FaSearch } from "react-icons/fa";
 import axios from "axios";
@@ -8,15 +8,22 @@ const URL = "https://fakestoreapi.com/products";
 
 function Home() {
   const [value, setValue] = useState("");
-  const [page, setPage] = useState(1);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const productsForPage = 10;
+  const [totalPages, setTotalPages] = useState(0);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const list = await axios.get(`${URL}`);
     setProducts(list.data);
+    setTotalPages(Math.ceil(list.data.length / productsForPage));
   };
+
+  const currentData = useMemo(() => {
+    const start = (currentPage - 1) * productsForPage;
+    return products.slice(start, start + productsForPage);
+  }, [currentPage, products]);
 
   return (
     <div className="home">
@@ -33,9 +40,9 @@ function Home() {
           />
         </form>
       </section>
-      <main className="pagesProducts">
-        {products &&
-          products.map(
+      {products && (
+        <main className="pagesProducts">
+          {currentData.map(
             (item: {
               id: string;
               image: string;
@@ -52,7 +59,19 @@ function Home() {
               );
             }
           )}
-      </main>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                setCurrentPage(i + 1);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </main>
+      )}
     </div>
   );
 }
