@@ -30,16 +30,17 @@ function Home() {
       <section className="searchSection">
         <h3>Busca lo que quieras</h3>
         <form onSubmit={handleSubmit}>
-          <button type="submit">
-            <FaSearch />
-          </button>
           <input
             type="text"
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
+          <button type="submit">
+            <FaSearch />
+          </button>
         </form>
       </section>
+
       {products && (
         <main className="pagesProducts">
           {currentData.map(
@@ -52,26 +53,31 @@ function Home() {
               return (
                 <Product
                   key={item.id}
+                  id={item.id}
                   image={item.image}
                   title={item.title}
                   price={item.price}
+                  isCart={false}
                 />
               );
             }
           )}
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                setCurrentPage(i + 1);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            >
-              {i + 1}
-            </button>
-          ))}
         </main>
       )}
+
+      <div className="divButtons">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              setCurrentPage(i + 1);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
